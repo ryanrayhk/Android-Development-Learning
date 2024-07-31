@@ -4,91 +4,43 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.text.isDigitsOnly
+import com.raychow.expensecalculator.ui.expensecalculator.ExpenseCalculatorView
 import com.raychow.expensecalculator.ui.theme.ExpenseCalculatorTheme
+import com.raychow.expensecalculator.ui.expensecalculator.ExpenseCalculatorViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val viewModel: TextFieldViewModel by viewModels()
-
         setContent {
             ExpenseCalculatorTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Column {
-                        Greeting(
-                            name = "Android",
-                            modifier = Modifier.padding(innerPadding)
-                        )
-                        Calculator()
-                    }
+                    ExpenseCalculatorView(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Composable
-fun Calculator(modifier: Modifier = Modifier) {
-    SimpleFilledTextFieldSample()
-}
-
-@Composable
-fun SimpleFilledTextFieldSample() {
-    var text by remember { mutableStateOf("Hello") }
-
-    TextField(
-        value = text,
-        onValueChange = { text = it },
-        label = { Text("Label") }
-    )
-}
-
-@Composable
-fun GroceryTextField() {
-    var text by remember { mutableStateOf("Hello") }
-
-    TextField(
-        value = text,
-        onValueChange = { text = it },
-        label = { Text("Grocery") }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ExpenseCalculatorTheme {
-        Greeting("Android")
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CalculatorPreview() {
-    ExpenseCalculatorTheme {
-        Calculator()
     }
 }
