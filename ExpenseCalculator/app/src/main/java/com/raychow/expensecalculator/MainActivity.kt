@@ -1,5 +1,6 @@
 package com.raychow.expensecalculator
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,21 +25,32 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.text.isDigitsOnly
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import com.raychow.expensecalculator.ui.expensecalculator.ExpenseCalculatorView
 import com.raychow.expensecalculator.ui.theme.ExpenseCalculatorTheme
 import com.raychow.expensecalculator.ui.expensecalculator.ExpenseCalculatorViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+// temp
+const val PREFERENCES_NAME = "my_preferences"
+
 class MainActivity : ComponentActivity() {
+    val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_NAME)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val viewModel = ViewModelProvider(this)[ExpenseCalculatorViewModel::class.java]
 
         setContent {
             ExpenseCalculatorTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ExpenseCalculatorView(modifier = Modifier.padding(innerPadding))
+                    ExpenseCalculatorView(modifier = Modifier.padding(innerPadding), viewModel)
                 }
             }
         }

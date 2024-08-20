@@ -17,47 +17,81 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.raychow.expensecalculator.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun ExpenseCalculatorView(modifier: Modifier, expenseCalculatorViewModel: ExpenseCalculatorViewModel = viewModel()) {
-    val gameUiState by expenseCalculatorViewModel.uiState.collectAsState()
+fun ExpenseCalculatorView(modifier: Modifier, viewModel: ExpenseCalculatorViewModel) {
+    val uiState by viewModel.uiState.collectAsState()
+
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
+
+    val focusRequesterGrocery = remember { FocusRequester() }
+    val focusRequesterMortgageOrRent = remember { FocusRequester() }
 
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        NumberTextField(
+            modifier = Modifier.focusRequester(focusRequesterGrocery),
+            value = formatNumber(uiState.grocery),
+            onValueChange = {
+                if(it.isDigitsOnly())
+                    viewModel.updateGrocery(it.toDouble())
+                else
+                    showSnackBar(
+                        scope = scope,
+                        snackBarHostState = snackBarHostState,
+                        focusRequester = focusRequesterGrocery,
+                    )
+            },
+            placeholderText = ""
+        )
+        NumberTextField(
+            modifier = Modifier.focusRequester(focusRequesterMortgageOrRent),
+            value = formatNumber(uiState.mortgageOrRent),
+            onValueChange = {
+                if(it.isDigitsOnly())
+                    viewModel.mortgageOrRent = it.toDouble()
+                else
+                    showSnackBar(
+                        scope = scope,
+                        snackBarHostState = snackBarHostState,
+                        focusRequester = focusRequesterMortgageOrRent,
+                    )
+            },
+            placeholderText = ""
+        )
+    }
+}
 
+fun formatNumber(double: Double): String {
+    if (double == 0.0){
+        return ""
+    }else{
+        return double.toString()
     }
 }
 
 @Composable
-fun GroceryTextField(
-    viewModel: ExpenseCalculatorViewModel,
+fun NumberTextField(
+    modifier: Modifier, value: String, onValueChange:(String)->Unit, placeholderText:String
 ) {
-    val scope = rememberCoroutineScope()
-    val snackBarHostState = remember { SnackbarHostState() }
-    val focusRequester = remember { FocusRequester() }
-
     OutlinedTextField(
-        modifier = Modifier.focusRequester(focusRequester),
-        value = viewModel.grocery,
-        onValueChange = {
-            if(it.isDigitsOnly())
-                viewModel.grocery = it
-            else
-                showSnackBar(scope, snackBarHostState, focusRequester)
-        },
-        label = { Text(text = "Grocery") },
-        placeholder ={ Text(text = "A") },
+        modifier = modifier,
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(text = stringResource(R.string.grocery)) },
+        placeholder ={ Text(text = placeholderText) },
         keyboardOptions = KeyboardOptions(keyboardType= KeyboardType.Number, imeAction = ImeAction.Next)
     )
 }
